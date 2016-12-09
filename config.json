@@ -1,0 +1,14 @@
+﻿{
+  "development": {
+    "ENV": {
+      "API_URL": "http://localhost:9000/",
+      "debug":  true
+    }
+  },
+  "production": {
+    "ENV": {
+      "API_URL": "https://taxi-backend.herokuapp.com/",
+      "debug": false
+    }
+  }
+}

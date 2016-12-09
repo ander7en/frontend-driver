@@ -7,10 +7,37 @@ var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
+var ngConstant = require('gulp-ng-constant');
 
 var paths = {
   sass: ['./scss/**/*.scss']
 };
+
+gulp.task('devConstants', function () {
+    var myConfig = require('./config.json');
+    var envConfig = myConfig["development"];
+    return ngConstant({
+        name: 'app.env',
+        constants: envConfig,
+        stream: true,
+        wrap: "'use strict';\n\n<%= __ngModule %>"
+    })
+    .pipe(rename('env.js'))
+    .pipe(gulp.dest('./www/js/'))
+});
+
+gulp.task('prodConstants', function () {
+    var myConfig = require('./config.json');
+    var envConfig = myConfig["production"];
+    return ngConstant({
+        name: 'app.env',
+        constants: envConfig,
+        stream: true,
+        wrap: "'use strict';\n\n<%= __ngModule %>"
+    })
+    .pipe(rename('env.js'))
+    .pipe(gulp.dest('./www/js/'))
+});
 
 gulp.task('default', ['sass']);
 

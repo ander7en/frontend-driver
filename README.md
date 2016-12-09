@@ -1,4 +1,4 @@
-# Ionic Blank Template
+# frontend-driver
 
 An application using Apache Cordova, Ionic Framework, and Typescript. Currently supporting iOS, Android and Windows 10.
 
@@ -18,6 +18,8 @@ To learn more about Tools for Apache Cordova, visit this [link](https://taco.vis
 5. Bower - npm install bower
 
 ## Getting Started
+
+don't forget to run gulp task 'devConstants' or 'prodConstants' depending on your needs
 
 With VS Code:
 * Clone this repository.
