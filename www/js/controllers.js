@@ -6,22 +6,29 @@ angular.module('app.controllers', ['app.services'])
 function ($scope, $stateParams, localStorageService, BackendService) {
     var self = this;
     $scope.credentials = { email: undefined, password: undefined };
-
+    $scope.storeCredentials = {localStorageSupport: false, password: false, email: false };
     init();
     function init() {
-        if (!localStorageService.isSupported) {
-            $scope.login = "UNSUPPORTED";
-        } else if (localStorageService.get('email') != undefined) {
-            $scope.credentials.email = localStorageService.get('email');
+        if (localStorageService.isSupported) {
+            if (localStorageService.get('storeCredentials') != undefined) {
+                $scope.storeCredentials = JSON.parse(localStorageService.get('storeCredentials'));
+            }
+            $scope.storeCredentials.localStorageSupport = true;
+            if ($scope.storeCredentials.email && localStorageService.get('email') != undefined) {
+                $scope.credentials.email = localStorageService.get('email');
+            }
         }
     }
 
     $scope.submit = function (form) {
         if (form.$valid) {
-            if (!localStorageService.isSupported) {
-                $scope.login = "UNSUPPORTED";
-            } else {
-                localStorageService.set('email', $scope.credentials.email)
+            if ($scope.storeCredentials.localStorageSupport) {
+                localStorageService.set('storeCredentials', JSON.stringify($scope.storeCredentials));
+                if ($scope.storeCredentials.email) {
+                    localStorageService.set('email', $scope.credentials.email)
+                } else {
+                    localStorageService.remove('email');
+                }
             }
             BackendService.login($scope.credentials);
         } else {
