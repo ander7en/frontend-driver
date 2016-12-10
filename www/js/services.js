@@ -8,17 +8,20 @@ angular.module('app.services', ['app.env'])
         return $window.Pusher;
     }
 })
-.service('BackendService', function (ENV, PusherFactory, $http) {
+.service('BackendService', function (ENV, PusherFactory, $http, $ionicLoading, $state) {
     var self = this;
     self.api_url = ENV.API_URL + '/drivers';
     var pusherUserId;
     var channel;
-
+    var currentUser = { loggedIn: false, acceptingOrders: false, credentials: { email:undefined, password: undefined} };
+    self.currentUser = currentUser;
     init();
 
     self.uuid = uuid;
     self.signup = register;
     self.login = login;
+    self.changeStatus = changeStatus;
+    self.logout = logout;
 
 
     function uuid() {
@@ -73,13 +76,39 @@ angular.module('app.services', ['app.env'])
     }
 
     function login(loginData) {
+        $ionicLoading.show({
+            templateUrl: '/templates/logginIn.html'
+        })
         var postData = {};
         angular.copy(loginData, postData);
-        postData.channel_id = pusherUserId
-        $http.post(self.api_url + '/', postData).then(function (response) {
-            console.log(response.text)
+        postData.channel_id = pusherUserId + '_channel'
+        $http.post(self.api_url + '/login', postData).then(function (response) {
+            if (response.text = 'Success') {
+                $state.go('waitingScreen');
+                currentUser.loggedIn = true;
+                currentUser.credentials = loginData;
+            }
         }, function (response) {
+            $ionicLoading.show({
+                template: 'Error. Something went wrong :(',
+                duration: 2000
+            });
             console.log(response);
         })
+    }
+
+    function changeStatus(status) {
+        currentUser.acceptingOrders = status;
+        var postData = {};
+        postData.email = currentUser.credentials.email;
+        postData.password = currentUser.credentials.password;
+        postData.status = currentUser.acceptingOrders;
+        $http.post(self.api_url + '/change_status', postData)
+    }
+
+    function logout() {
+        if (currentUser.loggedIn) {
+            $http.post(self.api_url + '/logout', currentUser.credentials)
+        }
     }
 });

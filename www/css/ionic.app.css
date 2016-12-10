@@ -9844,3 +9844,9 @@ a.button {
   -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center; }
+
+.grad-active {
+  background-color: #9afc5d; }
+
+.stopAccepting {
+  background-color: #ef473a; }

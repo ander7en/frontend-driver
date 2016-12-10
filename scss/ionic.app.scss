@@ -51,3 +51,11 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
     -ms-flex-align: center;
     align-items: center;
 }
+
+.grad-active{
+    background-color: #9afc5d;
+}
+
+.stopAccepting{
+    background-color: $assertive
+}

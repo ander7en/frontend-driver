@@ -14,7 +14,7 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
 
 })
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, BackendService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -27,6 +27,9 @@ angular.module('app', ['ionic', 'app.controllers', 'app.routes', 'app.directives
       StatusBar.styleDefault();
     }
   });
+  $ionicPlatform.on('pause', function () {
+    BackendSevice.logout();
+  })
 })
 
 /*

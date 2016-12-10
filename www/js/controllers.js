@@ -59,11 +59,48 @@ function ($scope, $stateParams, localStorageService, BackendService) {
 
 })
     
-.controller('waitingScreenCtrl', ['$scope', '$stateParams', 'BackendService', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
+.controller('waitingScreenCtrl', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $stateParams) {
+function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatform, $ionicPopup) {
+    $scope.currentStatus = { active: BackendService.currentUser.acceptinOrders };
+    var statusText = ['Accept orders', 'Go into "Busy" mode']
+    $scope.statusText = statusText[0];
+    $scope.changeStatus = changeStatus;
+    
+    function customBack() {
+        $ionicPopup.confirm({
+            title: 'Log out',
+            template: 'You will be logged out. Do you want to proceed?'
+        }).then(function(res){
+            if (res) {                
+                BackendService.logout();
+                $state.go('login');
+            }  
+        })
+    };
+    
+    var oldSoftBack = $rootScope.$ionicGoBack;
+    $rootScope.$ionicGoBack = function () {
+        customBack();
+    };
+    var deregisterSoftBack = function () {
+        $rootScope.$ionicGoBack = oldSoftBack;
+    };
 
+    var deregisterHardBack = $ionicPlatform.registerBackButtonAction(
+        customBack, 101
+    );
 
-}])
+    $scope.$on('$destroy', function () {
+        deregisterHardBack();
+        deregisterSoftBack();
+    });
+
+    function changeStatus() {
+        $scope.currentStatus.active = !$scope.currentStatus.active;
+        $scope.statusText = statusText[1 - statusText.indexOf($scope.statusText)];
+        BackendService.changeStatus($scope.currentStatus.active);
+    }
+})
  

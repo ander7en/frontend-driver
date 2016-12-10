@@ -8,6 +8,7 @@ plugins
 *.swo
 *.log
 *.DS_Store
+/www/js/env.js
 /www/lib
 /bin
 /bld
