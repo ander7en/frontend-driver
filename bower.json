@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "pusher-js": "pusher#^4.0.0",
-    "angular-local-storage": "^0.5.2"
+    "angular-local-storage": "^0.5.2",
+    "angular-messages": "1.5.3"
   }
 }

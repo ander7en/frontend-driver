@@ -8,15 +8,18 @@ angular.module('app.services', ['app.env'])
         return $window.Pusher;
     }
 })
-.service('BackendService', function (ENV, PusherFactory) {
+.service('BackendService', function (ENV, PusherFactory, $http) {
     var self = this;
-    self.api_url = ENV.API_URL + '/driver';
-    var pusherUsedId;
+    self.api_url = ENV.API_URL + '/drivers';
+    var pusherUserId;
     var channel;
 
     init();
 
-    this.uuid = uuid;
+    self.uuid = uuid;
+    self.signup = register;
+    self.login = login;
+
 
     function uuid() {
         var lut = [];
@@ -52,5 +55,31 @@ angular.module('app.services', ['app.env'])
             console.log(data);
             $rootScope.$apply();
         });
+    }
+
+    function register(regData) {
+        var postData = {};
+        angular.copy(regData, postData);
+        var fullName = regData.fullName.split(/\s+/g);
+        postData.firstName = fullName[0];
+        postData.lastName = fullName[1];
+        delete postData.fullName;
+
+        $http.post(self.api_url + '/register_driver', postData).then(function (response) {
+            console.log(response.text);
+        }, function (response) {
+            console.log(response);
+        });
+    }
+
+    function login(loginData) {
+        var postData = {};
+        angular.copy(loginData, postData);
+        postData.channel_id = pusherUserId
+        $http.post(self.api_url + '/', postData).then(function (response) {
+            console.log(response.text)
+        }, function (response) {
+            console.log(response);
+        })
     }
 });
