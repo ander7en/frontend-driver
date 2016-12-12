@@ -5,7 +5,7 @@
         <label class="item item-input" id="signup-input8">
           <input type="text" name="fullNameInput" placeholder="Full name" ng-minlength="3" ng-pattern="fullNamePattern" ng-model="registrationInfo.fullName" required>
         </label>
-            <div ng-if="regForm.fullNameInput.$dirty && regForm.fullNameInput.$invalid" ng-messages="regForm.fullNameInput.$error" role="alert">
+            <div ng-if="(regForm.fullNameInput.$dirty && regForm.fullNameInput.$invalid) || (regForm.carInfoInput.$invalid && regForm.$submitted)" ng-messages="regForm.fullNameInput.$error" role="alert">
                 <div ng-message="required">Please enter a value for this field.</div>
                 <div ng-message="minlength">This field should be at least 3 characters long.</div>
                 <div ng-message="pattern">This field should be specified in "FirstName LastName" format.</div>
@@ -13,28 +13,29 @@
         <label class="item item-input" id="signup-input11">
           <input type="text" name="carInfoInput" placeholder="Plate number" ng-model="registrationInfo.carInfo" ng-minlength="4" required>
         </label>
-            <div ng-if="regForm.carInfoInput.$dirty && regForm.carInfoInput.$invalid" ng-messages="regForm.carInfoInput.$error" role="alert">
+            <div ng-if="(regForm.carInfoInput.$dirty && regForm.carInfoInput.$invalid) || (regForm.carInfoInput.$invalid && regForm.$submitted)"
+                 ng-messages="regForm.carInfoInput.$error" role="alert">
                 <div ng-message="required">Please enter a value for this field.</div>
                 <div ng-message="minlength">This field should be at least 4 characters long.</div>
             </div>
         <label class="item item-input" id="signup-input12">
-          <input type="number" name="priceInput" min="0.00" step="0.01" ng-pattern="pricePattern" placeholder="Desired rate per km" ng-model="registrationInfo.pricePerKm" required>
+          <input type="number" name="priceInput" min="0.00" step="0.01" ng-pattern="pricePattern" placeholder="Desired rate per km" ng-model="registrationInfo.price" required>
         </label>
-            <div ng-if="regForm.priceInput.$dirty && regForm.priceInput.$invalid" ng-messages="regForm.priceInput.$error" role="alert">
+            <div ng-if="(regForm.priceInput.$dirty && regForm.priceInput.$invalid) || (regForm.carInfoInput.$invalid && regForm.$submitted)" ng-messages="regForm.priceInput.$error" role="alert">
                 <div ng-message="required">Please enter a value for this field.</div>
                 <div ng-message="pattern">This field should be specified in "#.##" format.</div>
             </div>
         <label class="item item-input" id="signup-input9">
           <input type="email" name="emailInput" placeholder="Email" ng-model="registrationInfo.email" required>
         </label>
-            <div ng-if="regForm.emailInput.$dirty && regForm.emailInput.$invalid" ng-messages="regForm.emailInput.$error" role="alert">
+            <div ng-if="(regForm.emailInput.$dirty && regForm.emailInput.$invalid) || (regForm.carInfoInput.$invalid && regForm.$submitted)" ng-messages="regForm.emailInput.$error" role="alert">
                 <div ng-message="required">Please enter a value for this field.</div>
                 <div ng-message="email">This field must be a valid email address.</div>
             </div>
         <label class="item item-input" id="signup-input10">
           <input type="password" name="passwordInput" placeholder="Password" ng-minlength="5" ng-model="registrationInfo.password" required>
         </label>
-            <div ng-if="regForm.passwordInput.$dirty && regForm.passwordInput.$invalid" ng-messages="regForm.passwordInput.$error" role="alert">
+            <div ng-if="(regForm.passwordInput.$dirty && regForm.passwordInput.$invalid) || (regForm.carInfoInput.$invalid && regForm.$submitted)" ng-messages="regForm.passwordInput.$error" role="alert">
                 <div ng-message="required">Please enter a value for this field.</div>
                 <div ng-message="minlength">This field should be at least 5 characters long.</div>
             </div>

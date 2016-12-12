@@ -14,7 +14,7 @@ angular.module('app.services', ['app.env', 'ngCordova'])
     var posOptions = {timeout: 10000, enableHighAccuracy: true};
 
     self.getCurrentLocation = getCurrentLocation;
-    
+
     function getCurrentLocation() {
         return $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
             self.currentLocation.lat = position.coords.latitude;
@@ -23,15 +23,16 @@ angular.module('app.services', ['app.env', 'ngCordova'])
             console.log(err);
         });
     }
-    
+
 })
-.service('BackendService', function (ENV, PusherFactory, $http, $ionicLoading, $state, GeolocationService, $ionicPopup) {
+.service('BackendService', function (ENV, PusherFactory, $http, $ionicLoading, $ionicHistory,
+                                     $state, GeolocationService, $ionicPopup) {
     var self = this;
     self.api_url = ENV.API_URL + '/drivers';
     var pusherUserId;
     var channel;
-    var currentUser = { loggedIn: false, acceptingOrders: false, credentials: { email:undefined, password: undefined} };
-    self.currentUser = currentUser;
+    var driverId;
+    self.currentUser = {loggedIn: false, acceptingOrders: false, credentials: {email: undefined, password: undefined}};
     init();
 
     self.uuid = uuid;
@@ -60,7 +61,7 @@ angular.module('app.services', ['app.env', 'ngCordova'])
         };
 
         return uuid();
-    };
+    }
 
     function init() {
         PusherFactory.logToConsole = ENV.debug;
@@ -70,7 +71,7 @@ angular.module('app.services', ['app.env', 'ngCordova'])
             encrypted: true
         });
         channel = pusher.subscribe(pusherUserId + '_channel');
-        channel.bind('orders', function (data) {
+        channel.bind('notify', function (data) {
             $ionicPopup.confirm({
                 title: 'Accept order',
                 template: 'Address:' + data.address,
@@ -90,14 +91,25 @@ angular.module('app.services', ['app.env', 'ngCordova'])
         var postData = {};
         angular.copy(regData, postData);
         var fullName = regData.fullName.split(/\s+/g);
-        postData.firstName = fullName[0];
-        postData.lastName = fullName[1];
+        postData.first_name = fullName[0];
+        postData.last_name = fullName[1];
         delete postData.fullName;
 
         $http.post(self.api_url + '/register_driver', postData).then(function (response) {
-            console.log(response.text);
+          if (response.data.text == 'Success') {
+            $ionicHistory.nextViewOptions({disableBack: true});
+            $state.go('login');
+          } else {
+            $ionicPopup.alert({
+              title: 'Error :(',
+              template: response.data.text
+            })
+          }
         }, function (response) {
-            console.log(response);
+          $ionicPopup.alert({
+            title: 'Error :(',
+            template: 'Something went wrong :('
+          })
         });
     }
 
@@ -107,13 +119,13 @@ angular.module('app.services', ['app.env', 'ngCordova'])
         })
         var postData = {};
         angular.copy(loginData, postData);
-        postData.channel_id = 'private-' + pusherUserId + '_channel'
+        postData.channelId = pusherUserId;
         $http.post(self.api_url + '/login', postData).then(function (response) {
-            if (response.text = 'Success') {
-                $state.go('waitingScreen');
-                currentUser.loggedIn = true;
-                currentUser.credentials = loginData;
-            }
+            $ionicLoading.hide();
+            $state.go('waitingScreen');
+            self.currentUser.loggedIn = true;
+            self.currentUser.credentials = loginData;
+            driverId = response.data.text;
         }, function (response) {
             $ionicLoading.show({
                 template: 'Error. Something went wrong :(',
@@ -124,20 +136,20 @@ angular.module('app.services', ['app.env', 'ngCordova'])
     }
 
     function changeStatus(status) {
-        currentUser.acceptingOrders = status;
+        self.currentUser.acceptingOrders = status;
         var postData = {};
-        postData.email = currentUser.credentials.email;
-        postData.password = currentUser.credentials.password;
-        postData.status = currentUser.acceptingOrders;
+        postData.driverId = driverId;
+        postData.status = self.currentUser.acceptingOrders;
         if (status) {
             postData.currentLocation = GeolocationService.currentLocation;
-        }        
+        }
         $http.post(self.api_url + '/change_status', postData)
     }
 
     function logout() {
-        if (currentUser.loggedIn) {
-            $http.post(self.api_url + '/logout', currentUser.credentials)
+        if (self.currentUser.loggedIn) {
+            var postData = {driverId: driverId};
+            $http.post(self.api_url + '/logout', postData);
         }
     }
 });

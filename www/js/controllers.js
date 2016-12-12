@@ -1,5 +1,5 @@
 angular.module('app.controllers', ['app.services'])
-  
+
 .controller('loginCtrl', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
@@ -36,7 +36,7 @@ function ($scope, $stateParams, localStorageService, BackendService) {
         }
     };
 })
-   
+
 .controller('signupCtrl',  // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
@@ -47,7 +47,7 @@ function ($scope, $stateParams, localStorageService, BackendService) {
     $scope.registrationInfo = {};
     $scope.registrationInfo.fullName = undefined;
     $scope.registrationInfo.carInfo = undefined;
-    $scope.registrationInfo.pricePerKm = undefined;
+    $scope.registrationInfo.price = undefined;
     $scope.registrationInfo.email = undefined;
     $scope.registrationInfo.password = undefined;
 
@@ -58,7 +58,7 @@ function ($scope, $stateParams, localStorageService, BackendService) {
     };
 
 })
-    
+
 .controller('waitingScreenCtrl', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
@@ -67,19 +67,19 @@ function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatfor
     var statusText = ['Accept orders', 'Go into "Busy" mode']
     $scope.statusText = statusText[0];
     $scope.changeStatus = changeStatus;
-    
+
     function customBack() {
         $ionicPopup.confirm({
             title: 'Log out',
             template: 'You will be logged out. Do you want to proceed?'
         }).then(function(res){
-            if (res) {                
+            if (res) {
                 BackendService.logout();
                 $state.go('login');
-            }  
+            }
         })
     };
-    
+
     var oldSoftBack = $rootScope.$ionicGoBack;
     $rootScope.$ionicGoBack = function () {
         customBack();
@@ -98,7 +98,7 @@ function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatfor
     });
 
     function changeStatus() {
-        if ($scope.currentStatus.active) {
+        if (!$scope.currentStatus.active) {
             GeolocationService.getCurrentLocation().then(function () {
                 $scope.currentStatus.active = !$scope.currentStatus.active;
                 $scope.statusText = statusText[1 - statusText.indexOf($scope.statusText)];
@@ -108,7 +108,6 @@ function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatfor
             $scope.currentStatus.active = !$scope.currentStatus.active;
             $scope.statusText = statusText[1 - statusText.indexOf($scope.statusText)];
             BackendService.changeStatus($scope.currentStatus.active);
-        }              
+        }
     }
 })
- 
