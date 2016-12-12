@@ -1,4 +1,4 @@
 'use strict';
 
 angular.module("app.env", [])
-.constant("ENV", {"API_URL":"https://taxi-backend.herokuapp.com/","debug":true});
+.constant("ENV", {"API_URL":"http://localhost:3000/","debug":true});
