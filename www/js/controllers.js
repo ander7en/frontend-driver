@@ -62,8 +62,8 @@ function ($scope, $stateParams, localStorageService, BackendService) {
 .controller('waitingScreenCtrl', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatform, $ionicPopup) {
-    $scope.currentStatus = { active: BackendService.currentUser.acceptinOrders };
+function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatform, $ionicPopup, GeolocationService) {
+    $scope.currentStatus = { active: BackendService.currentUser.acceptingOrders };
     var statusText = ['Accept orders', 'Go into "Busy" mode']
     $scope.statusText = statusText[0];
     $scope.changeStatus = changeStatus;
@@ -98,9 +98,17 @@ function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatfor
     });
 
     function changeStatus() {
-        $scope.currentStatus.active = !$scope.currentStatus.active;
-        $scope.statusText = statusText[1 - statusText.indexOf($scope.statusText)];
-        BackendService.changeStatus($scope.currentStatus.active);
+        if ($scope.currentStatus.active) {
+            GeolocationService.getCurrentLocation().then(function () {
+                $scope.currentStatus.active = !$scope.currentStatus.active;
+                $scope.statusText = statusText[1 - statusText.indexOf($scope.statusText)];
+                BackendService.changeStatus($scope.currentStatus.active);
+            });
+        } else {
+            $scope.currentStatus.active = !$scope.currentStatus.active;
+            $scope.statusText = statusText[1 - statusText.indexOf($scope.statusText)];
+            BackendService.changeStatus($scope.currentStatus.active);
+        }              
     }
 })
  

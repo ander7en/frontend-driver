@@ -1,4 +1,4 @@
-angular.module('app.services', ['app.env'])
+angular.module('app.services', ['app.env', 'ngCordova'])
 
 .factory('PusherFactory', function ($window) {
     if (!$window.Pusher) {
@@ -8,7 +8,24 @@ angular.module('app.services', ['app.env'])
         return $window.Pusher;
     }
 })
-.service('BackendService', function (ENV, PusherFactory, $http, $ionicLoading, $state) {
+.service('GeolocationService', function($cordovaGeolocation){
+    var self = this;
+    self.currentLocation = { lng: undefined, lat: undefined };
+    var posOptions = {timeout: 10000, enableHighAccuracy: true};
+
+    self.getCurrentLocation = getCurrentLocation;
+    
+    function getCurrentLocation() {
+        return $cordovaGeolocation.getCurrentPosition(posOptions).then(function (position) {
+            self.currentLocation.lat = position.coords.latitude;
+            self.currentLocation.lng = position.coords.longitude;
+        }, function (err) {
+            console.log(err);
+        });
+    }
+    
+})
+.service('BackendService', function (ENV, PusherFactory, $http, $ionicLoading, $state, GeolocationService, $ionicPopup) {
     var self = this;
     self.api_url = ENV.API_URL + '/drivers';
     var pusherUserId;
@@ -53,10 +70,19 @@ angular.module('app.services', ['app.env'])
             encrypted: true
         });
         channel = pusher.subscribe(pusherUserId + '_channel');
-        channel.bind('update', function (data) {
-            console.log("Receive update event with data:");
-            console.log(data);
-            $rootScope.$apply();
+        channel.bind('orders', function (data) {
+            $ionicPopup.confirm({
+                title: 'Accept order',
+                template: 'Address:' + data.address,
+                cancelText: 'Reject',
+                cancelType: 'button-assertive',
+                okText: 'Accept',
+                okType: 'button-balanced'
+            }).then(function (res) {
+                if (res) {
+                    // TODO work here
+                }
+            })
         });
     }
 
@@ -81,7 +107,7 @@ angular.module('app.services', ['app.env'])
         })
         var postData = {};
         angular.copy(loginData, postData);
-        postData.channel_id = pusherUserId + '_channel'
+        postData.channel_id = 'private-' + pusherUserId + '_channel'
         $http.post(self.api_url + '/login', postData).then(function (response) {
             if (response.text = 'Success') {
                 $state.go('waitingScreen');
@@ -103,6 +129,9 @@ angular.module('app.services', ['app.env'])
         postData.email = currentUser.credentials.email;
         postData.password = currentUser.credentials.password;
         postData.status = currentUser.acceptingOrders;
+        if (status) {
+            postData.currentLocation = GeolocationService.currentLocation;
+        }        
         $http.post(self.api_url + '/change_status', postData)
     }
 
