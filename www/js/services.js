@@ -25,13 +25,14 @@ angular.module('app.services', ['app.env', 'ngCordova'])
     }
 
 })
-.service('BackendService', function (ENV, PusherFactory, $http, $ionicLoading, $ionicHistory,
+.service('BackendService', function (ENV, $rootScope, PusherFactory, $http, $ionicLoading, $ionicHistory,
                                      $state, GeolocationService, $ionicPopup) {
     var self = this;
     self.api_url = ENV.API_URL + '/drivers';
     var pusherUserId;
     var channel;
     var driverId;
+    var orderId;
     self.currentUser = {loggedIn: false, acceptingOrders: false, credentials: {email: undefined, password: undefined}};
     init();
 
@@ -40,6 +41,7 @@ angular.module('app.services', ['app.env', 'ngCordova'])
     self.login = login;
     self.changeStatus = changeStatus;
     self.logout = logout;
+    self.finish = finish;
 
 
     function uuid() {
@@ -83,12 +85,22 @@ angular.module('app.services', ['app.env', 'ngCordova'])
                 okType: 'button-balanced'
             }).then(function (res) {
                 var postData = {};
+                if (res) {
+                  $rootScope.ride.active = true;
+                }
+                orderId = data.OrderId;
                 postData.driver_id = driverId;
                 postData.response = res;
                 postData.order_id = data.OrderId;
                 $http.post(self.api_url + '/response', postData)
             })
         });
+    }
+
+    function finish(){
+      $rootScope.ride.active = false;
+      postData = {orderId: orderId};
+      return $http.post(self.api_url + '/finish', postData)
     }
 
     function register(regData) {

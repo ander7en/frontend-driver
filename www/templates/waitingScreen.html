@@ -1,6 +1,7 @@
 <ion-view title="Waiting screen" id="page5">
   <ion-content padding="true" scroll="false" class="center has-header" ng-class="{'grad-active': currentStatus.active}">
-    <button id="waitingScreen-button7" class="button  button-block" ng-class="{'button-assertive': currentStatus.active,
+    <button ng-hide="$root.ride.active" id="waitingScreen-button7" class="button  button-block" ng-class="{'button-assertive': currentStatus.active,
             'button-balanced': !currentStatus.active}" ng-click="changeStatus()">{{statusText}}</button>
+    <button ng-if="$root.ride.active" class="button  button-block" ng-click="finishTrip()">Finish</button>
   </ion-content>
 </ion-view>

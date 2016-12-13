@@ -62,11 +62,13 @@ function ($scope, $stateParams, localStorageService, BackendService) {
 .controller('waitingScreenCtrl', // The following is the constructor function for this page's controller. See https://docs.angularjs.org/guide/controller
 // You can include any angular dependencies as parameters for this function
 // TIP: Access Route Parameters for your page via $stateParams.parameterName
-function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatform, $ionicPopup, GeolocationService) {
-    $scope.currentStatus = { active: BackendService.currentUser.acceptingOrders };
-    var statusText = ['Accept orders', 'Go into "Busy" mode']
+function ($scope, $rootScope, $state, $stateParams, BackendService, $ionicPlatform, $ionicPopup, GeolocationService) {
+    $scope.currentStatus = { active: BackendService.currentUser.acceptingOrders};
+    var statusText = ['Accept orders', 'Go into "Busy" mode'];
     $scope.statusText = statusText[0];
     $scope.changeStatus = changeStatus;
+    $scope.finishTrip = finishTrip;
+    $rootScope.ride = {active: false};
 
     function customBack() {
         $ionicPopup.confirm({
@@ -109,5 +111,9 @@ function ($scope, $rootScope,$state, $stateParams, BackendService, $ionicPlatfor
             $scope.statusText = statusText[1 - statusText.indexOf($scope.statusText)];
             BackendService.changeStatus($scope.currentStatus.active);
         }
+    }
+
+    function finishTrip() {
+      BackendService.finish()
     }
 })
