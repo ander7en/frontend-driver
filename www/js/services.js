@@ -72,17 +72,21 @@ angular.module('app.services', ['app.env', 'ngCordova'])
         });
         channel = pusher.subscribe(pusherUserId + '_channel');
         channel.bind('notify', function (data) {
+			console.log(data);
             $ionicPopup.confirm({
                 title: 'Accept order',
-                template: 'Address:' + data.address,
+                template: 'Source address: ' + data.OrderInfo.source_address
+                + '<br>Destination address: ' + data.OrderInfo.destination_address,
                 cancelText: 'Reject',
                 cancelType: 'button-assertive',
                 okText: 'Accept',
                 okType: 'button-balanced'
             }).then(function (res) {
-                if (res) {
-                    // TODO work here
-                }
+                var postData = {};
+                postData.driver_id = driverId;
+                postData.response = res;
+                postData.order_id = data.OrderId;
+                $http.post(self.api_url + '/response', postData)
             })
         });
     }
