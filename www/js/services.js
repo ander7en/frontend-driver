@@ -148,7 +148,7 @@ angular.module('app.services', ['app.env', 'ngCordova'])
 
     function logout() {
         if (self.currentUser.loggedIn) {
-            var postData = {driverId: driverId};
+            var postData = {driver_id: driverId};
             $http.post(self.api_url + '/logout', postData);
         }
     }
