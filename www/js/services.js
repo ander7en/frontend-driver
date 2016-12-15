@@ -137,11 +137,19 @@ angular.module('app.services', ['app.env', 'ngCordova'])
         angular.copy(loginData, postData);
         postData.channelId = pusherUserId;
         $http.post(self.api_url + '/login', postData).then(function (response) {
-            $ionicLoading.hide();
-            $state.go('waitingScreen');
-            self.currentUser.loggedIn = true;
-            self.currentUser.credentials = loginData;
-            driverId = response.data.text;
+			console.log(response);
+			if (response.data.wasSuccessful == 'success') {            
+				$ionicLoading.hide();
+		        $state.go('waitingScreen');
+		        self.currentUser.loggedIn = true;
+		        self.currentUser.credentials = loginData;
+		        driverId = response.data.text;
+			} else {
+	            $ionicLoading.show({
+	                template: 'Error. ' + response.data.text,
+	                duration: 2000
+	            });
+			}
         }, function (response) {
             $ionicLoading.show({
                 template: 'Error. Something went wrong :(',
@@ -164,6 +172,8 @@ angular.module('app.services', ['app.env', 'ngCordova'])
 
     function logout() {
         if (self.currentUser.loggedIn) {
+			self.currentUser.loggedIn = false;
+			self.currentUser.acceptingOrders = false;
             var postData = {driver_id: driverId};
             $http.post(self.api_url + '/logout', postData);
         }
